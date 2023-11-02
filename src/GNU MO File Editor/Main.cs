@@ -50,6 +50,7 @@ namespace GNU_MO_File_Editor
 					DataRow row = dataTable1.NewRow();
 					MOLine line = _moReader[i];
 					row["index"] = line.Index;
+					row["subIndex"] = line.SubIndex;
 					row["id"] = line.Original;
 					row["value"] = line.Translated.Replace("\n", Environment.NewLine);
 
@@ -78,6 +79,8 @@ namespace GNU_MO_File_Editor
 				saveToolStripMenuItem.Enabled = true;
 				toolStripStatusLabel1.Text = $"Loaded {_moReader.Count} lines.";
 				impexpToolStripMenuItem.Enabled = true;
+
+				mnuAddLine.Enabled = true;
 				_dataLoaded = true;
 			}
 			catch (Exception ex)
@@ -136,16 +139,7 @@ namespace GNU_MO_File_Editor
                 return;
             }
 
-            int i = -1;
-
-			int.TryParse(dataTable1.Rows[e.RowIndex][0].ToString(), out i);
-
-			if (i < 0)
-            {
-                return;
-            }
-
-            UpdateInternalArray(i);
+            UpdateInternalArray(e.RowIndex);
 		}
 
 		private void forumthreadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,12 +153,12 @@ namespace GNU_MO_File_Editor
 
 			if (dataGridView1.SelectedRows.Count > 0)
             {
-                int.TryParse(dataGridView1.SelectedRows[0].Cells[0].Value.ToString(), out pos);
+                int.TryParse(dataGridView1.SelectedRows[0].Index.ToString(), out pos);
             }
 
             if (dataGridView1.SelectedCells.Count > 0)
             {
-                int.TryParse(dataGridView1.Rows[dataGridView1.SelectedCells[0].RowIndex].Cells[0].Value.ToString(), out pos);
+                int.TryParse(dataGridView1.Rows[dataGridView1.SelectedCells[0].RowIndex].Index.ToString(), out pos);
             }
 
             for (int i = pos - 1; i >= 0; i--)
@@ -190,12 +184,12 @@ namespace GNU_MO_File_Editor
 
 			if (dataGridView1.SelectedRows.Count > 0)
             {
-                int.TryParse(dataGridView1.SelectedRows[0].Cells[0].Value.ToString(), out pos);
+                int.TryParse(dataGridView1.SelectedRows[0].Index.ToString(), out pos);
             }
 
             if (dataGridView1.SelectedCells.Count > 0)
             {
-                int.TryParse(dataGridView1.Rows[dataGridView1.SelectedCells[0].RowIndex].Cells[0].Value.ToString(), out pos);
+                int.TryParse(dataGridView1.Rows[dataGridView1.SelectedCells[0].RowIndex].Index.ToString(), out pos);
             }
 
             for (int i = pos + 1; i < _moReader.Count; i++)
@@ -207,6 +201,7 @@ namespace GNU_MO_File_Editor
 					dataGridView1.Rows[i].Selected = true;
 
 					dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];
+					dataGridView1.FirstDisplayedScrollingRowIndex = i;
 
 					return;
 				}
@@ -249,9 +244,20 @@ namespace GNU_MO_File_Editor
 		{
 			try
 			{
+				if (index >=_moReader.Count)
+                {
+					_moReader.Add(new MOLine()
+					{
+						Index = (int)dataTable1.Rows[index][0],
+					});
+                }
+
 				MOLine line = _moReader[index];
 
-				line.Translated = dataTable1.Rows[index][2].ToString().Replace(Environment.NewLine, "\n");
+				var row = dataTable1.Rows[index];
+				line.SubIndex = int.Parse(row[3].ToString());
+				line.Original = row[1].ToString().Replace(Environment.NewLine, "\n");
+				line.Translated = row[2].ToString().Replace(Environment.NewLine, "\n");
 
 				_moReader[index] = line;
 				return true;
@@ -325,10 +331,11 @@ namespace GNU_MO_File_Editor
 					{
 						DataRow row = (DataRow)item;
 						string index = row[0].ToString();
+						string indexSub = row[3].ToString();
 						string id = row[1].ToString();
 						string text = row[2].ToString();
 						int textRows = row[2].ToString().Split('\n').Length;
-						string output = textRows.ToString() + separator + index + separator + id + separator + text;
+						string output = textRows.ToString() + separator + index + separator + indexSub + separator + id + separator + text;
 
 						sw.WriteLine(output);
 
@@ -386,6 +393,7 @@ namespace GNU_MO_File_Editor
 
 			string value = "";
 			int index = 0;
+			int indexSub = 0;
 			string id = "";
 			int rowcountPerItem = 0;
 			int failedrows = 0;
@@ -398,8 +406,9 @@ namespace GNU_MO_File_Editor
 					string[] item = Fullline.Split(separator);//new line
 					rowcountPerItem = int.Parse(item[0]);
 					index = int.Parse(item[1]);
-					id = item[2];
-					value = item[3];
+					indexSub = int.Parse(item[2]);
+					id = item[3];
+					value = item[4];
 
 					if (rowcountPerItem > 1)
 					{
@@ -411,7 +420,7 @@ namespace GNU_MO_File_Editor
 						i += rowcountPerItem - 1;
 					}
 
-					DataRow[] row2 = dataTable1.Select("index=" + index);
+					DataRow[] row2 = dataTable1.Select($"index={index} AND subIndex={indexSub}");
 					if (row2.Length > 0)
 					{
 						string lastvalue = row2[0]["value"].ToString();
@@ -441,5 +450,23 @@ namespace GNU_MO_File_Editor
 		{
 			toolStripStatusLabel1.Text = $"Selected separator: {separatorCombobox.SelectedItem}";
 		}
-	}
+
+        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+			if (e.KeyCode == Keys.Enter)
+            {
+				btnNext_Click(sender, null);
+			}
+        }
+
+        private void mnuAddLine_Click(object sender, EventArgs e)
+        {
+			int count = dataSet1.Tables[0].Rows.Count;
+			var rowLast = dataSet1.Tables[0].Rows[count - 1];
+			int lastIndex = int.Parse(rowLast[0].ToString());
+
+			dataSet1.Tables[0].Rows.Add(lastIndex + 1, "", "", -1);
+			dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.RowCount - 1;
+		}
+    }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace GNU_MO_File_Editor
@@ -12,6 +13,7 @@ namespace GNU_MO_File_Editor
 	struct MOLine
 	{
 		public int Index;
+		public int SubIndex;
 		public string Original;
 		public string Translated;
 	}
@@ -32,9 +34,9 @@ namespace GNU_MO_File_Editor
 		private uint _s; // size of hashing table
 		private uint _h; // offset of hashing table
 
-		protected const int OSOffset = 28;
-		protected const uint IndexEntrySize = 8;
-		protected const uint HashEntrySize = 4;
+		private const int offsetTextTable = 0x1C;
+		private const uint TextEntrySize = 8;
+		private const uint HashEntrySize = 4;
 
 		private uint[] _originalStringOffsets;
 		private int[] _originalStringLengths;
@@ -54,7 +56,7 @@ namespace GNU_MO_File_Editor
 		// public fields
 		public uint Count
 		{
-			get { return _n; }
+			get { return (uint)(Lines?.Count ?? 0); }
 		}
 
 		// constructor
@@ -192,23 +194,59 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 			return Encoding.UTF8.GetString(stringBytes);
 		}
 
-		protected MOLine ReadLineAt(int index)
+		protected MOLine[] ReadLineAt(int index)
 		{
-			MOLine line;
+			var lines = new List<MOLine>();
 
-			line.Index = index;
-			line.Original = GetStringAt(_originalStringOffsets[index], _originalStringLengths[index]);
-			line.Translated = GetStringAt(_translatedStringOffsets[index], _translatedStringLengths[index]);
+			var keyLine = GetStringAt(_originalStringOffsets[index], _originalStringLengths[index]);
+			var textLine = GetStringAt(_translatedStringOffsets[index], _translatedStringLengths[index]);
 
-			return line;
+			if (keyLine.IndexOf('\0') > 0)
+            {
+				var keyLines = keyLine.Split('\0');
+				var textLines = textLine.Split('\0');
+				if (keyLines.Length != textLines.Length)
+				{
+					throw new FormatException("Processing error, keys count is not match text counts");
+				}
+
+                for (int i = 0; i < keyLines.Length; i++)
+                {
+					lines.Add(new MOLine()
+					{
+						Index = index,
+						SubIndex = i,
+						Original = keyLines[i],
+						Translated = textLines[i],
+					});
+				}
+			}
+			else
+            {
+				lines.Add(new MOLine()
+				{
+					Index = index,
+					SubIndex = -1,
+					Original = keyLine,
+					Translated = textLine,
+				});
+			}
+
+
+			return lines.ToArray();
 		}
 
-		protected void PopulateLines()
+        internal void Add(MOLine item)
+        {
+			Lines.Add(item);
+		}
+
+        protected void PopulateLines()
 		{
 			Lines = new List<MOLine>();
 
 			for (int i = 0; i < _n; i++)
-				Lines.Add(ReadLineAt(i));
+				Lines.AddRange(ReadLineAt(i));
 		}
 		#endregion
 
@@ -224,36 +262,42 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 			// revision
 			writer.Write(_r);
 
+			uint packCount = (uint)Lines.Select(c => c.Index).Distinct().Count();
+
 			// number of strings
-			writer.Write(_n);
+			writer.Write(packCount);
 
 			// offset of table with original strings
-			writer.Write(OSOffset);
+			writer.Write(offsetTextTable);
 
 			// offset of table with translation strings
-			writer.Write(_n*IndexEntrySize + OSOffset);
+			writer.Write(packCount * TextEntrySize + offsetTextTable);
 
 			// size of hashing table
 			writer.Write(_s);
 
 			// offset of hashing table
-			uint hashOffset = _n*IndexEntrySize*2 + OSOffset;
+			uint hashOffset = packCount * TextEntrySize * 2 + offsetTextTable;
 			writer.Write(hashOffset);
 			
 			// offsets and lengths
-			int[] osLengths = new int[_n];
-			uint[] osOffsets = new uint[_n];
+			int[] osLengths = new int[packCount];
+			uint[] osOffsets = new uint[packCount];
 
-			int[] tsLengths = new int[_n];
-			uint[] tsOffsets = new uint[_n];
+			int[] tsLengths = new int[packCount];
+			uint[] tsOffsets = new uint[packCount];
 
 			// get original string offsets
 			uint osOffs = hashOffset + _s*HashEntrySize;
 			uint tsOffs = 0;
-			for (int i = 0; i < _n; i++)
+			for (int i = 0; i < packCount; i++)
 			{
-				osLengths[i] = Encoding.UTF8.GetBytes(Lines[i].Original).Length;
-				tsLengths[i] = Encoding.UTF8.GetBytes(Lines[i].Translated).Length;
+				var lines = Lines.Where(c => c.Index == i).OrderBy(c => c.SubIndex).ToList();
+				string lineKey = lines.Aggregate("", (prev, line) => { return prev + (prev.Length > 0 ? "\0":"") + line.Original; });
+				string lineValue = lines.Aggregate("", (prev, line) => { return prev + (prev.Length > 0 ? "\0":"") + line.Translated; });
+
+				osLengths[i] = Encoding.UTF8.GetBytes(lineKey).Length;
+				tsLengths[i] = Encoding.UTF8.GetBytes(lineValue).Length;
 
 				//if (tsLengths[i] != _translatedStringLengths[i])
 				//	throw new Exception(string.Format("Invalid lengths: original={0}, new={1}", tsLengths[i], _translatedStringLengths[i]));
@@ -269,7 +313,7 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 			}
 
 			// get translated string offsets
-			for (int i = 0; i < _n; i++)
+			for (int i = 0; i < packCount; i++)
 			{
 				tsOffsets[i] = tsOffs;
 
@@ -284,18 +328,24 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 			writer.Write(_hashTable);
 
 			// write original strings
-			for (int i = 0; i < _n; i++)
+			for (int i = 0; i < packCount; i++)
 			{
-				byte[] stringBytes = Encoding.UTF8.GetBytes(Lines[i].Original);
+				var lines = Lines.Where(c => c.Index == i).OrderBy(c => c.SubIndex).ToList();
+				string lineKey = lines.Aggregate("", (prev, line) => { return prev + (prev.Length > 0 ? "\0" : "") + line.Original; });
+
+				byte[] stringBytes = Encoding.UTF8.GetBytes(lineKey);
 
 				writer.Write(stringBytes);
 				writer.Write((byte)0);
 			}
 
 			// write translated strings
-			for (int i = 0; i < _n; i++)
+			for (int i = 0; i < packCount; i++)
 			{
-				byte[] stringBytes = Encoding.UTF8.GetBytes(Lines[i].Translated);
+				var lines = Lines.Where(c => c.Index == i).OrderBy(c => c.SubIndex).ToList();
+				string lineValue = lines.Aggregate("", (prev, line) => { return prev + (prev.Length > 0 ? "\0" : "") + line.Translated; });
+
+				byte[] stringBytes = Encoding.UTF8.GetBytes(lineValue);
 
 				writer.Write(stringBytes);
 				writer.Write((byte)0);
@@ -317,7 +367,6 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 			}
 			set
 			{
-				value.Index = key;
 				Lines[key] = value;
 			}
 		}

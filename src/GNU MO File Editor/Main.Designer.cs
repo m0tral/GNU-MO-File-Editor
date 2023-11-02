@@ -28,17 +28,15 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.indexDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataSet1 = new System.Data.DataSet();
             this.dataTable1 = new System.Data.DataTable();
             this.dataColumn1 = new System.Data.DataColumn();
             this.dataColumn2 = new System.Data.DataColumn();
             this.dataColumn3 = new System.Data.DataColumn();
+            this.dataColumn4 = new System.Data.DataColumn();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +60,11 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.saveFileDialog2 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
+            this.indexDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.subIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.mnuAddLine = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataSet1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataTable1)).BeginInit();
@@ -73,59 +76,25 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.indexDataGridViewTextBoxColumn,
+            this.subIndex,
             this.idDataGridViewTextBoxColumn,
             this.value});
             this.dataGridView1.DataMember = "mo_data";
             this.dataGridView1.DataSource = this.dataSet1;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 27);
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 40);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(919, 426);
+            this.dataGridView1.Size = new System.Drawing.Size(919, 413);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             this.dataGridView1.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView1_EditingControlShowing);
             this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
             this.dataGridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyDown);
-            // 
-            // indexDataGridViewTextBoxColumn
-            // 
-            this.indexDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.indexDataGridViewTextBoxColumn.DataPropertyName = "index";
-            dataGridViewCellStyle11.Format = "N0";
-            dataGridViewCellStyle11.NullValue = null;
-            this.indexDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle11;
-            this.indexDataGridViewTextBoxColumn.DividerWidth = 1;
-            this.indexDataGridViewTextBoxColumn.Frozen = true;
-            this.indexDataGridViewTextBoxColumn.HeaderText = "#";
-            this.indexDataGridViewTextBoxColumn.Name = "indexDataGridViewTextBoxColumn";
-            this.indexDataGridViewTextBoxColumn.ReadOnly = true;
-            this.indexDataGridViewTextBoxColumn.Width = 40;
-            // 
-            // idDataGridViewTextBoxColumn
-            // 
-            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
-            this.idDataGridViewTextBoxColumn.DividerWidth = 1;
-            this.idDataGridViewTextBoxColumn.HeaderText = "ID";
-            this.idDataGridViewTextBoxColumn.MinimumWidth = 120;
-            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
-            this.idDataGridViewTextBoxColumn.ReadOnly = true;
-            this.idDataGridViewTextBoxColumn.Width = 240;
-            // 
-            // value
-            // 
-            this.value.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.value.DataPropertyName = "value";
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.value.DefaultCellStyle = dataGridViewCellStyle12;
-            this.value.HeaderText = "Value";
-            this.value.Name = "value";
             // 
             // dataSet1
             // 
@@ -139,12 +108,8 @@
             this.dataTable1.Columns.AddRange(new System.Data.DataColumn[] {
             this.dataColumn1,
             this.dataColumn2,
-            this.dataColumn3});
-            this.dataTable1.Constraints.AddRange(new System.Data.Constraint[] {
-            new System.Data.UniqueConstraint("Constraint1", new string[] {
-                        "index"}, true)});
-            this.dataTable1.PrimaryKey = new System.Data.DataColumn[] {
-        this.dataColumn1};
+            this.dataColumn3,
+            this.dataColumn4});
             this.dataTable1.TableName = "mo_data";
             // 
             // dataColumn1
@@ -158,22 +123,27 @@
             // 
             this.dataColumn2.Caption = "ID";
             this.dataColumn2.ColumnName = "id";
-            this.dataColumn2.ReadOnly = true;
             // 
             // dataColumn3
             // 
             this.dataColumn3.Caption = "Value";
             this.dataColumn3.ColumnName = "value";
             // 
+            // dataColumn4
+            // 
+            this.dataColumn4.Caption = "##";
+            this.dataColumn4.ColumnName = "subIndex";
+            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.helpToolStripMenuItem,
-            this.impexpToolStripMenuItem});
+            this.impexpToolStripMenuItem,
+            this.mnuAddLine});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(919, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(919, 40);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -185,7 +155,7 @@
             this.toolStripMenuItem1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 36);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // openToolStripMenuItem
@@ -220,7 +190,7 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.forumthreadToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 36);
             this.helpToolStripMenuItem.Text = "&Help";
             // 
             // forumthreadToolStripMenuItem
@@ -238,20 +208,20 @@
             this.toolStripMenuItem4,
             this.splitChartoolStripMenu});
             this.impexpToolStripMenuItem.Name = "impexpToolStripMenuItem";
-            this.impexpToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
+            this.impexpToolStripMenuItem.Size = new System.Drawing.Size(94, 36);
             this.impexpToolStripMenuItem.Text = "Import/Export";
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(159, 22);
             this.toolStripMenuItem3.Text = "Export to .txt";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.Export_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(159, 22);
             this.toolStripMenuItem4.Text = "Import from .txt";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.Import_Click);
             // 
@@ -260,7 +230,7 @@
             this.splitChartoolStripMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.separatorCombobox});
             this.splitChartoolStripMenu.Name = "splitChartoolStripMenu";
-            this.splitChartoolStripMenu.Size = new System.Drawing.Size(180, 22);
+            this.splitChartoolStripMenu.Size = new System.Drawing.Size(159, 22);
             this.splitChartoolStripMenu.Text = "Split character";
             // 
             // separatorCombobox
@@ -321,15 +291,16 @@
             // tbSearch
             // 
             this.tbSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbSearch.Location = new System.Drawing.Point(517, 4);
+            this.tbSearch.Location = new System.Drawing.Point(517, 10);
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(258, 20);
             this.tbSearch.TabIndex = 3;
+            this.tbSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearch_KeyDown);
             // 
             // btnPrev
             // 
             this.btnPrev.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPrev.Location = new System.Drawing.Point(781, 2);
+            this.btnPrev.Location = new System.Drawing.Point(781, 8);
             this.btnPrev.Name = "btnPrev";
             this.btnPrev.Size = new System.Drawing.Size(60, 23);
             this.btnPrev.TabIndex = 4;
@@ -340,7 +311,7 @@
             // btnNext
             // 
             this.btnNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnNext.Location = new System.Drawing.Point(847, 2);
+            this.btnNext.Location = new System.Drawing.Point(847, 8);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(60, 23);
             this.btnNext.TabIndex = 5;
@@ -358,16 +329,65 @@
             this.openFileDialog2.FileName = "openFileDialog2";
             this.openFileDialog2.Filter = "Text Files | *.txt";
             // 
+            // indexDataGridViewTextBoxColumn
+            // 
+            this.indexDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.indexDataGridViewTextBoxColumn.DataPropertyName = "index";
+            dataGridViewCellStyle5.Format = "N0";
+            dataGridViewCellStyle5.NullValue = null;
+            this.indexDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
+            this.indexDataGridViewTextBoxColumn.DividerWidth = 1;
+            this.indexDataGridViewTextBoxColumn.Frozen = true;
+            this.indexDataGridViewTextBoxColumn.HeaderText = "#";
+            this.indexDataGridViewTextBoxColumn.Name = "indexDataGridViewTextBoxColumn";
+            this.indexDataGridViewTextBoxColumn.ReadOnly = true;
+            this.indexDataGridViewTextBoxColumn.Width = 40;
+            // 
+            // subIndex
+            // 
+            this.subIndex.DataPropertyName = "subIndex";
+            this.subIndex.HeaderText = "##";
+            this.subIndex.Name = "subIndex";
+            // 
+            // idDataGridViewTextBoxColumn
+            // 
+            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
+            this.idDataGridViewTextBoxColumn.DividerWidth = 1;
+            this.idDataGridViewTextBoxColumn.HeaderText = "ID";
+            this.idDataGridViewTextBoxColumn.MinimumWidth = 120;
+            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
+            this.idDataGridViewTextBoxColumn.Width = 240;
+            // 
+            // value
+            // 
+            this.value.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.value.DataPropertyName = "value";
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.value.DefaultCellStyle = dataGridViewCellStyle6;
+            this.value.HeaderText = "Value";
+            this.value.Name = "value";
+            // 
+            // mnuAddLine
+            // 
+            this.mnuAddLine.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.mnuAddLine.Enabled = false;
+            this.mnuAddLine.Image = global::GNU_MO_File_Editor.Properties.Resources.icons8_plus_32;
+            this.mnuAddLine.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.mnuAddLine.Name = "mnuAddLine";
+            this.mnuAddLine.Size = new System.Drawing.Size(44, 36);
+            this.mnuAddLine.Text = "Add";
+            this.mnuAddLine.Click += new System.EventHandler(this.mnuAddLine_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(919, 475);
+            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnNext);
             this.Controls.Add(this.btnPrev);
             this.Controls.Add(this.tbSearch);
-            this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
@@ -403,9 +423,6 @@
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
 		private System.Data.DataColumn dataColumn3;
-		private System.Windows.Forms.DataGridViewTextBoxColumn indexDataGridViewTextBoxColumn;
-		private System.Windows.Forms.DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
-		private System.Windows.Forms.DataGridViewTextBoxColumn value;
 		private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
 		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem forumthreadToolStripMenuItem;
@@ -419,6 +436,12 @@
         private System.Windows.Forms.ToolStripComboBox separatorCombobox;
         private System.Windows.Forms.SaveFileDialog saveFileDialog2;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
+        private System.Data.DataColumn dataColumn4;
+        private System.Windows.Forms.ToolStripMenuItem mnuAddLine;
+        private System.Windows.Forms.DataGridViewTextBoxColumn indexDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn subIndex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn value;
     }
 }
 
